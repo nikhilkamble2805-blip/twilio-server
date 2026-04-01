@@ -3,6 +3,7 @@ from twilio.twiml.voice_response import VoiceResponse
 from twilio.rest import Client
 from dotenv import load_dotenv
 import os
+from flask import request
 
 load_dotenv()
 
@@ -36,3 +37,18 @@ def alert():
         from_="+15626693526"
     )
     return "Call Triggered"
+@app.route("/sms", methods=["POST"])
+def sms_reply():
+    msg = request.form.get("Body")
+
+    print("SMS RECEIVED:", msg)
+
+    if msg and msg.strip().upper() == "ALERT":
+        call = client.calls.create(
+            url=f"{BASE_URL}/voice",
+            to="+919356851405",
+            from_="+15626693526"
+        )
+        return "Call Triggered"
+
+    return "No action"
