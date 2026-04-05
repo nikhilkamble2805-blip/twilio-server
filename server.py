@@ -39,16 +39,28 @@ def alert():
     return "Call Triggered"
 @app.route("/sms", methods=["POST"])
 def sms_reply():
-    msg = request.form.get("Body")
+    raw = request.data.decode("utf-8")
+    form_msg = request.form.get("msg")
 
-    print("SMS RECEIVED:", msg)
+    print("RAW DATA:", raw)
+    print("FORM MSG:", form_msg)
 
-    if msg and msg.strip().upper() == "ALERT":
-        call = client.calls.create(
+    msg = form_msg if form_msg else raw
+
+    if msg:
+        msg = msg.strip().upper()
+
+    print("FINAL MSG:", msg)
+
+    if "ALERT" in msg:
+        print("CALL TRIGGERED")
+
+        client.calls.create(
             url=f"{BASE_URL}/voice",
             to="+919356851405",
             from_="+15626693526"
         )
+
         return "Call Triggered"
 
     return "No action"
